@@ -1,0 +1,35 @@
+{
+  "name": "token-exchange",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "./build/main.js",
+  "scripts": {
+    "buy": "ts-node ./src/buy.ts",
+    "mint": "ts-node ./src/mint.ts",
+    "burn": "ts-node ./src/burn.ts",
+    "vaultMint": "ts-node ./src/vaultMint.ts",
+    "prebuild": "rimraf build",
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prebundleType": "npm run build",
+    "bundleType": "api-extractor run --local --verbose"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@noble/ed25519": "^2.0.0",
+    "@solana/spl-token": "^0.3.7",
+    "@solana/web3.js": "^1.75.0",
+    "yargs": "^17.7.1"
+  },
+  "devDependencies": {
+    "@tsconfig/node18": "^1.0.1",
+    "@types/node": "^18.15.11",
+    "rimraf": "^5.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  }
+}
