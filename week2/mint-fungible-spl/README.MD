@@ -1,11 +1,11 @@
 ## Mint SPL token
 
 Summary:
-- Followed the guide, but uploaded metadata in Shadow-drive's CLI.
-- Mint SMA Token
-  - Token address: SMAnja1DeYqgBov2epS4322Ltxb7yiN6d5wQhsWvUX4
+- Went through quicknode guide.
+- Uploaded metadata in Shadow-drive's CLI.
+- Mint **SMA** Token
+  - Token address: `SMAnja1DeYqgBov2epS4322Ltxb7yiN6d5wQhsWvUX4`
   - decimals = 3
-  - Initial number of Tokens mint = 10
 
 ## Command to run Minting (Not for re-run):
 

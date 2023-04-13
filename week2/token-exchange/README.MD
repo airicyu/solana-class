@@ -3,7 +3,7 @@
 We support below functions:
 - Mint token for user (1 SOL = 1000 SMA)
 - Burn token (just burn)
-- Buy token (Buy 1000 SMA by 1 SOL with Vault)
+- Buy token (Use 1 SOL to Buy 1000 SMA from Vault)
 - Vault Free Mint (Print money to Vault)
 
 -----
