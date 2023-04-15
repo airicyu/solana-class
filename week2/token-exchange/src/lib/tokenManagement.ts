@@ -30,6 +30,9 @@ export class TokenManagement {
      * @returns
      */
     static async draftMintTokenTrx(minter: Keypair, mintAmount: number) {
+        /**
+         * Input validations, pre-processing
+         */
         if (mintAmount <= 0) {
             throw new Error('Invalid mint amount!')
         }
@@ -43,6 +46,9 @@ export class TokenManagement {
 
         console.log(`Mint token operation, minter: ${minter.publicKey.toString()}, input ${inputAmount} SOL to get ${mintAmount} token.`)
 
+        /**
+         * Prep associate token account
+         */
         const minterATA = await getOrCreateAssociatedTokenAccount(connection, minter, config.mintAccount.publicKey, minter.publicKey)
         console.log(
             `minter Account: ${minterATA.address.toString()}, original holding ${TokenManagement.getTokenAmountFromNumber(
@@ -52,6 +58,12 @@ export class TokenManagement {
 
         const instructions: TransactionInstruction[] = []
 
+        /**
+         * Prep 2 instructions,
+         *
+         * 1) User transfer SOL to Vault
+         * 2) Mint token to user
+         */
         instructions.push(
             SystemProgram.transfer({
                 fromPubkey: minter.publicKey,
@@ -76,6 +88,8 @@ export class TokenManagement {
         const v0Trx = new VersionedTransaction(message)
 
         const messageData = v0Trx.message.serialize()
+
+        // transaction signed by authority owner
         v0Trx.addSignature(config.vaultWallet.publicKey, sign(messageData, config.vaultWallet.secretKey))
 
         return v0Trx
@@ -88,6 +102,9 @@ export class TokenManagement {
      * @returns
      */
     static async draftVaultMintTokenTrx(mintAmount: number) {
+        /**
+         * Input validations, pre-processing
+         */
         if (mintAmount <= 0) {
             throw new Error('Invalid mint amount!')
         }
@@ -99,6 +116,9 @@ export class TokenManagement {
 
         console.log(`Vault Mint token operation, get ${mintAmount} token.`)
 
+        /**
+         * Prep associate token account
+         */
         const vaultATA = await getOrCreateAssociatedTokenAccount(
             connection,
             config.vaultWallet,
@@ -113,6 +133,9 @@ export class TokenManagement {
 
         const instructions: TransactionInstruction[] = []
 
+        /**
+         * Prep instruction for free mint to vault
+         */
         instructions.push(
             createMintToInstruction(
                 config.mintAccount.publicKey, //Mint
@@ -132,6 +155,8 @@ export class TokenManagement {
         const v0Trx = new VersionedTransaction(message)
 
         const messageData = v0Trx.message.serialize()
+
+        // transaction signed by authority owner
         v0Trx.addSignature(config.vaultWallet.publicKey, sign(messageData, config.vaultWallet.secretKey))
 
         return v0Trx
@@ -145,6 +170,9 @@ export class TokenManagement {
      * @returns
      */
     static async draftBuyTokenTrx(buyer: Keypair, buyAmount: number) {
+        /**
+         * Input validations, pre-processing
+         */
         if (buyAmount <= 0) {
             throw new Error('Invalid buy amount!')
         }
@@ -158,6 +186,9 @@ export class TokenManagement {
 
         console.log(`Buy token operation, buyer: ${buyer.publicKey.toString()}, input ${inputAmount} SOL to get ${buyAmount} token.`)
 
+        /**
+         * Prep associate token account
+         */
         const vaultATA = await getOrCreateAssociatedTokenAccount(
             connection,
             config.vaultWallet,
@@ -175,6 +206,12 @@ export class TokenManagement {
 
         const instructions: TransactionInstruction[] = []
 
+        /**
+         * Prep 2 instructions,
+         *
+         * 1) User transfer SOL to Vault
+         * 2) Vault transfer token to user
+         */
         instructions.push(
             SystemProgram.transfer({
                 fromPubkey: buyer.publicKey,
@@ -194,6 +231,8 @@ export class TokenManagement {
         const v0Trx = new VersionedTransaction(message)
 
         const messageData = v0Trx.message.serialize()
+
+        // transaction signed by authority owner
         v0Trx.addSignature(config.vaultWallet.publicKey, sign(messageData, config.vaultWallet.secretKey))
 
         return v0Trx
@@ -207,12 +246,18 @@ export class TokenManagement {
      * @returns
      */
     static async draftBurnTokenTrx(burner: Keypair, burnAmount: number) {
+        /**
+         * Input validations, pre-processing
+         */
         if (burnAmount <= 0) {
             throw new Error('Invalid burn amount!')
         }
 
         console.log(`Burn token operation, burner: ${burner.publicKey.toString()}, burn ${burnAmount} token.`)
 
+        /**
+         * Prep associate token account
+         */
         const burnerATA = await getOrCreateAssociatedTokenAccount(connection, burner, config.mintAccount.publicKey, burner.publicKey)
         const holdingAmount = TokenManagement.getTokenAmountFromNumber(+burnerATA.amount.toString())
         console.log(`burner Account: ${burnerATA.address.toString()}, original holding ${holdingAmount} tokens.`)
@@ -223,6 +268,9 @@ export class TokenManagement {
 
         const instructions: TransactionInstruction[] = []
 
+        /**
+         * Prep instruction for burn user token
+         */
         instructions.push(
             createBurnCheckedInstruction(
                 burnerATA.address,
@@ -272,7 +320,3 @@ export class TokenManagement {
         return tokenNumber / 10 ** config.tokenConfig.decimals
     }
 }
-
-// get decimals
-const tokenAccountInfo = await connection.getParsedAccountInfo(config.mintAccount.publicKey)
-const decimals = (tokenAccountInfo.value?.data as ParsedAccountData)?.parsed?.info?.decimals as number

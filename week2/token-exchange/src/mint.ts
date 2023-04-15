@@ -15,15 +15,21 @@ const testUserWallet = Keypair.fromSeed(Uint8Array.from(JSON.parse(fs.readFileSy
 
 console.log(`Test user wallet: `, testUserWallet.publicKey.toString())
 
-// connection.requestAirdrop(testUserWallet.publicKey, LAMPORTS_PER_SOL * 2)
-
+/**
+ * Draft mint token transaction which signed by token side
+ */
 const transaction = await TokenManagement.draftMintTokenTrx(testUserWallet, mintAmount)
 
+/**
+ * Pass it to client side to ask for signature
+ */
 const rl = readline.createInterface({ input, output })
 const answer = await rl.question('Do you want to proceed mint? (Y/n)')
 rl.close()
 
 if (!(answer === 'n' || answer === 'N')) {
     transaction.addSignature(testUserWallet.publicKey, sign(transaction.message.serialize(), testUserWallet.secretKey))
+
+    // Send transaction
     await TokenManagement.sendTrx(transaction)
 }

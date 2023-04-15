@@ -17,5 +17,6 @@ const answer = await rl.question('Do you want to proceed mint? (Y/n)')
 rl.close()
 
 if (!(answer === 'n' || answer === 'N')) {
+    // Send transaction
     await TokenManagement.sendTrx(transaction)
 }
